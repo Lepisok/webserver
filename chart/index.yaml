@@ -2,13 +2,23 @@ apiVersion: v1
 entries:
   webserver:
   - apiVersion: v2
-    appVersion: "1.0"
-    created: "2023-10-24T21:53:33.871955133Z"
+    appVersion: "2.0"
+    created: "2023-10-24T22:39:38.783366963Z"
     description: A Helm chart for Kubernetes
-    digest: f9c42cc3d1bdd18859c3a91716200656ca2e122b34f691580d5471aa3e825c9b
+    digest: aa38b615ea30fe349f5835a9265d090d9ee6b004739dc1cd5f8fe6ddf334aa90
+    name: webserver
+    type: application
+    urls:
+    - webserver-2.tgz
+    version: "2"
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2023-10-24T22:39:38.783090218Z"
+    description: A Helm chart for Kubernetes
+    digest: bfbd07908655f08d8d44f3071154a543ef4ad412f12d8eeb23a8eb0e34e49828
     name: webserver
     type: application
     urls:
     - webserver-1.tgz
     version: "1"
-generated: "2023-10-24T21:53:33.871513629Z"
+generated: "2023-10-24T22:39:38.782630304Z"
