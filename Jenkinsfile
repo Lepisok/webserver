@@ -85,7 +85,7 @@ pipeline {
         stage('Create Helm Archive') {
             steps {
                 script {
-                    dir("test_deploy/nginx") {
+                    dir("test_deploy") {
                         sh "helm package nginx -d chart"
                     }
                 }
