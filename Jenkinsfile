@@ -114,7 +114,7 @@ pipeline {
                             sh """
                                 git add .
                                 git commit -m "Build #\${BUILD_NUMBER}"
-                                git push origin -f
+                                git push -f
                             """
                     }
                 }
