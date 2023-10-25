@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     // Клонируем репозиторий Helm
-                    sh "git clone https://lepisok.github.io/test_deploy/chart"
+                    sh "git clone https://github.com/Lepisok/test_deploy"
                 }
             }
         }
