@@ -69,6 +69,7 @@ pipeline {
                 script {
                     dir("${env.TEMP_HELM_REPO_FOLDER_NAME}/${env.HELM_REPO_NAME}/${env.WEB_APP_NAME}") {
                         sh """
+                            cd chart
                             cat values.yaml | sed -e "s/tag:.*/tag: \"\${COMMIT_TAG}\"/" > values.tmp.yaml
                             mv values.tmp.yaml values.yaml
                         """
