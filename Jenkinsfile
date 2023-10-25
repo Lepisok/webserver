@@ -110,18 +110,18 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy") {
-                        withCredentials([usernamePassword(credentialsId: 'github-credentials-id', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                            sh """
-                                git add .
-                                git commit -m "Build #\${BUILD_NUMBER}"
-                                git config credential.helper '!echo password=$PASSWORD; echo'
-                                git push https://github.com/Lepisok/test_deploy.git main
-                            """
+                        sh """
+                            git add .
+                            git config --global user.email "${USER_EMAIL}"
+                            git config --global user.name "${USER_NAME}"
+                            git commit -m "Build #\${BUILD_NUMBER}"
+                            git push origin main
+                        """
                         }
                     }
                 }
             }
-        }
+        
 
         stage('Cleanout') {
             steps {
