@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+    environment {
+    DOCKERHUB_REGISTRY = 'docker.io'
+    // Add other environment variables here if needed
+}
 
     stages {
         stage('Extract Tag from Commit') {
