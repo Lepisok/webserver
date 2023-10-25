@@ -76,6 +76,8 @@ pipeline {
                 script {
                     dir("${env.TEMP_HELM_REPO_FOLDER_NAME}/${env.HELM_REPO_NAME}/${env.WEB_APP_NAME}") {
                         sh """
+                            cd test_deploy
+                            cd nginx
                             cat values.yaml | sed -e "s/tag:.*/tag: \"\${COMMIT_TAG}\"/" > values.tmp.yaml
                             mv values.tmp.yaml values.yaml
                         """
