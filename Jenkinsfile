@@ -110,18 +110,19 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy") {
-                        sh """
-                            git add .
-                            git config --global user.email "${USER_EMAIL}"
-                            git config --global user.name "${USER_NAME}"
-                            git commit -m "Build #\${BUILD_NUMBER}"
-                            git push origin -f
-                        """
+                        withCredentials([string(credentialsId: GITHUB_TOKEN, variable: 'github-pat')]) {
+                            sh """
+                                git add .
+                                git config --global user.email "${USER_EMAIL}"
+                                git config --global user.name "${USER_NAME}"
+                                git commit -m "Build #\${BUILD_NUMBER}"
+                                git push origin -f
+                            """
                         }
                     }
                 }
             }
-        
+        }
 
         stage('Cleanout') {
             steps {
