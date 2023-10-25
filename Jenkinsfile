@@ -40,8 +40,13 @@ pipeline {
         stage('Get Helm Repository Contents') {
             steps {
                 script {
-                    // Клонируем репозиторий Helm
-                    sh "git clone https://github.com/Lepisok/test_deploy"
+                    if (fileExists('test_deploy')) {
+                        dir('test_deploy') {
+                            sh 'git pull origin master' // Update the repository
+                        }
+                    } else {
+                        sh "git clone https://github.com/Lepisok/test_deploy"
+                    }
                 }
             }
         }
