@@ -57,6 +57,7 @@ pipeline {
                     dir("${env.TEMP_HELM_REPO_FOLDER_NAME}/${env.HELM_REPO_NAME}") {
                         dir(env.WEB_APP_NAME) {
                             sh """
+                                cd test_deploy
                                 cd chart
                                 cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
