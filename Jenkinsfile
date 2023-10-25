@@ -110,7 +110,7 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy") {
-                        withCredentials([string(credentialsId: GITHUB_TOKEN, variable: 'github-pat')]) {
+                        withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_PAT')]) {
                             sh """
                                 git add .
                                 git config --global user.email "${USER_EMAIL}"
