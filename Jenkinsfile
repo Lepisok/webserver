@@ -119,7 +119,6 @@ pipeline {
                 }
             }
         }
-    }
 
         stage('Cleanout') {
             steps {
