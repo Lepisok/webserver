@@ -120,7 +120,6 @@ pipeline {
                     }
                 }
             }
-        
 
         stage('Cleanout') {
             steps {
