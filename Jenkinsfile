@@ -114,6 +114,7 @@ pipeline {
                             sh """
                                 git add .
                                 git commit -m "Build #\${BUILD_NUMBER}"
+                                git config credential.helper '!echo password=$PASSWORD; echo'
                                 git push https://github.com/Lepisok/test_deploy.git main
                             """
                         }
