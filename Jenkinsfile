@@ -114,7 +114,7 @@ pipeline {
                             sh """
                                 git add .
                                 git commit -m "Build #\${BUILD_NUMBER}"
-                                GIT_ASKPASS=echo GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git push origin -f
+                                git push origin -f
                             """
                         }
                     }
