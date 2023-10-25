@@ -3,6 +3,8 @@ pipeline {
 
     environment {
     DOCKERHUB_REGISTRY = 'docker.io'
+    COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+
     // Add other environment variables here if needed
 }
 
