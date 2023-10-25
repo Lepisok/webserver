@@ -107,10 +107,12 @@ pipeline {
 
         stage('Push to Git Repository') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'github', keyFileVariable: 'SSH_KEY')]) {
+                script {
                     dir("test_deploy/nginx") {
                         sh """
                             git add .
+                            git config --global user.email "${USER_EMAIL}"
+                            git config --global user.name "${USER_NAME}"
                             git commit -m "Build #\${BUILD_NUMBER}"
                             git push origin -f
                         """
