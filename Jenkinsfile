@@ -109,13 +109,12 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy/nginx") {
-                        sh """
-                            git add .
-                            git config --global user.email "${USER_EMAIL}"
-                            git config --global user.name "${USER_NAME}"
-                            git commit -m "Build #\${BUILD_NUMBER}"
-                            git push origin -f
-                        """
+                        withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_PAT')]) {
+                            sh """
+                                git add .
+                                git commit -m "Build #\${BUILD_NUMBER}"
+                                git push origin -f
+                            """
                     }
                 }
             }
