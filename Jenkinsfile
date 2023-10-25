@@ -109,7 +109,7 @@ pipeline {
         stage('Push to Git Repository') {
             steps {
                 script {
-                    dir("test_deploy/nginx") {
+                    dir("test_deploy") {
                         withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_PAT')]) {
                             sh """
                                 git add .
