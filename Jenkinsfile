@@ -4,7 +4,8 @@ pipeline {
     environment {
     DOCKERHUB_REGISTRY = 'docker.io'
     COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-
+    USER_EMAIL = 'aleksandr_podkop@mail.ru'
+    USER_NAME = 'Lepisok'
     // Add other environment variables here if needed
 }
 
