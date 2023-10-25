@@ -6,6 +6,7 @@ pipeline {
     COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
+    SSH_CREDENTIALS = credentials('jenkins')
     // Add other environment variables here if needed
 }
 
@@ -108,19 +109,19 @@ pipeline {
 
         stage('Push to Git Repository') {
             steps {
-                script {
+            script {
                     dir("test_deploy") {
-                        sh """
-                            git add .
-                            git config --global user.email "${USER_EMAIL}"
-                            git config --global user.name "${USER_NAME}"
-                            git commit -m "Build #\${BUILD_NUMBER}"
-                            git push origin main
-                        """
+                        withCredentials([usernamePassword(credentialsId: 'jenkins', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            sh """
+                                git add .
+                                git commit -m "Build #\${BUILD_NUMBER}"
+                                git push origin main
+                            """
                         }
                     }
                 }
             }
+        }
 
         stage('Cleanout') {
             steps {
