@@ -6,7 +6,6 @@ pipeline {
     COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
-    GITHUB_PAT = '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'
     // Add other environment variables here if needed
 }
 
