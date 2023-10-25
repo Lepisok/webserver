@@ -6,7 +6,7 @@ pipeline {
     COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
-    SSH_CREDENTIALS = credentials('jenkins')
+    SSH_CREDENTIALS = credentials('7bc0c8af-07b7-4784-975d-eb6b79759bb6')
     // Add other environment variables here if needed
 }
 
@@ -111,7 +111,7 @@ pipeline {
             steps {
             script {
                     dir("test_deploy") {
-                        withCredentials([usernamePassword(credentialsId: 'jenkins', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        withCredentials([usernamePassword(credentialsId: '7bc0c8af-07b7-4784-975d-eb6b79759bb6', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                             sh """
                                 git add .
                                 git commit -m "Build #\${BUILD_NUMBER}"
