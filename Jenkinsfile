@@ -78,8 +78,8 @@ pipeline {
                         sh """
                             cd test_deploy
                             cd nginx
-                            cat values.yaml | sed -e "s/tag:.*/tag: \"\${COMMIT_TAG}\"/" > values.tmp.yaml
-                            mv values.tmp.yaml values.yaml
+                            cat test_deploy/nginx/Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > test_deploy/nginx/Chart.tmp.yaml
+                            mv test_deploy/nginx/Chart.tmp.yaml test_deploy/nginx/Chart.yaml
                         """
                     }
                 }
