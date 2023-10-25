@@ -55,7 +55,7 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy") {
-                        dir(env.WEB_APP_NAME) {
+                        dir("nginx") {
                             sh """
                                 cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
@@ -86,7 +86,7 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy/nginx") {
-                        sh "helm package ${env.WEB_APP_NAME} -d charts"
+                        sh "helm package nginx -d charts"
                     }
                 }
             }
@@ -121,7 +121,7 @@ pipeline {
         stage('Cleanout') {
             steps {
                 script {
-                    dir(env.TEMP_HELM_REPO_FOLDER_NAME) {
+                    dir("nginx") {
                         deleteDir()
                     }
                 }
