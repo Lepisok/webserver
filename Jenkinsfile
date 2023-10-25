@@ -110,11 +110,13 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy/nginx") {
-                        sh """
-                            git add .
-                            git commit -m "Build #\${BUILD_NUMBER}"
-                            GIT_ASKPASS=echo GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git push origin -f
-                        """
+                        withCredentials([string(credentialsId: 'github-pat', variable: 'GITHUB_PAT')]) {
+                            sh """
+                                git add .
+                                git commit -m "Build #\${BUILD_NUMBER}"
+                                GIT_ASKPASS=echo GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git push origin -f
+                            """
+                        }
                     }
                 }
             }
