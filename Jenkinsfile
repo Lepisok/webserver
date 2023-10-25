@@ -72,7 +72,7 @@ pipeline {
         stage('Update Image Tag') {
             steps {
                 script {
-                    dir("${env.TEMP_HELM_REPO_FOLDER_NAME}/${env.HELM_REPO_NAME}/${env.WEB_APP_NAME}") {
+                    dir("test_deploy/nginx") {
                         sh """
                             cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                             mv Chart.tmp.yaml Chart.yaml
@@ -85,7 +85,7 @@ pipeline {
         stage('Create Helm Archive') {
             steps {
                 script {
-                    dir("${env.TEMP_HELM_REPO_FOLDER_NAME}/${env.HELM_REPO_NAME}") {
+                    dir("test_deploy/nginx") {
                         sh "helm package ${env.WEB_APP_NAME} -d charts"
                     }
                 }
@@ -95,7 +95,7 @@ pipeline {
         stage('Update Helm Index') {
             steps {
                 script {
-                    dir("${env.TEMP_HELM_REPO_FOLDER_NAME}/${env.HELM_REPO_NAME}/charts") {
+                    dir("test_deploy/nginx/charts") {
                         sh "helm repo index ."
                     }
                 }
@@ -105,7 +105,7 @@ pipeline {
         stage('Push to Git Repository') {
             steps {
                 script {
-                    dir("${env.TEMP_HELM_REPO_FOLDER_NAME}/${env.HELM_REPO_NAME}") {
+                    dir("test_deploy/nginx") {
                         sh """
                             git add .
                             git config --global user.email "${USER_EMAIL}"
