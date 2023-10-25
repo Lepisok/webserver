@@ -42,7 +42,7 @@ pipeline {
                 script {
                     if (fileExists('test_deploy')) {
                         dir('test_deploy') {
-                            sh 'git pull origin master' // Update the repository
+                            sh 'git pull origin main' // Update the repository
                         }
                     } else {
                         sh "git clone https://github.com/Lepisok/test_deploy"
