@@ -2,14 +2,6 @@ pipeline {
     agent any
 
     stages {
-        
-        stage('Clone Repository') {
-            steps {
-                script {
-                    checkout([$class: 'GitSCM', branches: [[name: '*/v*']], userRemoteConfigs: [[url: 'https://github.com/Lepisok/test_deploy.git']]])
-                }
-            }
-        }
         stage('Extract Tag from Commit') {
             steps {
                 script {
