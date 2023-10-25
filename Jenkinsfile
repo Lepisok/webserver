@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     environment {
     DOCKERHUB_REGISTRY = 'docker.io'
     // Add other environment variables here if needed
@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     // Клонируем репозиторий Helm
-                    sh "git clone https://github.com/your-helm-repo.git"
+                    sh "git clone https://lepisok.github.io/test_deploy/chart"
                 }
             }
         }
