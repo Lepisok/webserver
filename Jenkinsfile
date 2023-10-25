@@ -86,7 +86,7 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy/nginx") {
-                        sh "helm package nginx -d charts"
+                        sh "helm package nginx -d chart"
                     }
                 }
             }
@@ -95,7 +95,7 @@ pipeline {
         stage('Update Helm Index') {
             steps {
                 script {
-                    dir("test_deploy/nginx/charts") {
+                    dir("test_deploy/nginx/chart") {
                         sh "helm repo index ."
                     }
                 }
