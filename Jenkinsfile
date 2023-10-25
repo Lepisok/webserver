@@ -7,6 +7,7 @@ pipeline {
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
     GITHUB_PAT = credentials('github-pat')
+    BUILD_NUMBER = COMMIT_TAG
     // Add other environment variables here if needed
 }
 
