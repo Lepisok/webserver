@@ -58,7 +58,7 @@ pipeline {
                         dir(env.WEB_APP_NAME) {
                             sh """
                                 cd test_deploy
-                                cd chart
+                                cd nginx
                                 cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
 
