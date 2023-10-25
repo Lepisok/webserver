@@ -54,7 +54,7 @@ pipeline {
         stage('Update Chart Version') {
             steps {
                 script {
-                    dir("nginx@tmp/nginx") {
+                    dir("test_deploy") {
                         dir(env.WEB_APP_NAME) {
                             sh """
                                 cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
