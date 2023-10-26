@@ -139,5 +139,16 @@ pipeline {
                 echo "##jenkins[setParameter name='PREV_COMMIT_TAG' value='${COMMIT_TAG}']"
             }
         }
+
+        stage('Redeploy Kubernetes Deployment') {
+            steps {
+                script {
+                    // Update the Docker image version in your Helm chart values.yaml file
+                    sh "sed -i 's/imageTag: v1/imageTag: v2/' test_deploy/nginx/values.yaml"
+                    
+                    // Apply the updated Helm chart to your Kubernetes cluster
+                    sh "helm upgrade nginx chart"
+        }
+    
     }
 }
