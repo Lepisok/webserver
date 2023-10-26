@@ -6,7 +6,7 @@ pipeline {
     COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
-    GIT_REPO_URL = 'https://github.com/Lepisok/webserver.git'
+    GIT_REPO_URL = 'git@github.com:Lepisok/webserver.git'
     GIT_CREDENTIALS_ID = 'github' // Replace with your actual credentials ID
     // Add other environment variables here if needed
 }
