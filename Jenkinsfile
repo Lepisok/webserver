@@ -26,6 +26,11 @@ pipeline {
                 }
             }
     }
+        stage('Check COMMIT_TAG') {
+            steps {
+                echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
