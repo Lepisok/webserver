@@ -119,7 +119,7 @@ pipeline {
                             git remote add origin ${GIT_REPO_URL}
                             git add .
                             git commit -m "Build #\${BUILD_NUMBER}"
-                            git push origin main
+                            git push origin FETCH_HEAD
                         """
                         }
                     }
