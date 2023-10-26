@@ -51,7 +51,7 @@ pipeline {
                             sh 'git pull origin main' // Update the repository
                         }
                     } else {
-                        sh "git clone https://github.com/Lepisok/test_deploy"
+                        sh "git clone git@github.com:Lepisok/webserver.git"
                     }
                 }
             }
