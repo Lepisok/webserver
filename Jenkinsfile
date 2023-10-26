@@ -6,8 +6,7 @@ pipeline {
     COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
-    GIT_REPO_URL = 'git@github.com:Lepisok/webserver.git'
-    GIT_CREDENTIALS_ID = 'github' // Replace with your actual credentials ID
+    SSH_CREDENTIALS = credentials('7bc0c8af-07b7-4784-975d-eb6b79759bb6')
     // Add other environment variables here if needed
 }
 
@@ -48,10 +47,10 @@ pipeline {
                 script {
                     if (fileExists('test_deploy')) {
                         dir('test_deploy') {
-                            sh 'git pull origin main --allow-unrelated-histories' // Update the repository
+                            sh 'git pull origin main' // Update the repository
                         }
                     } else {
-                        sh "git clone git@github.com:Lepisok/webserver.git"
+                        sh "git clone https://github.com/Lepisok/test_deploy"
                     }
                 }
             }
@@ -110,20 +109,19 @@ pipeline {
 
         stage('Push to Git Repository') {
             steps {
-                script {
-                    // Initialize a Git repository in the target directory
-                    dir('test_deploy') {                        
-                        sh """
-                            git remote remove origin
-                            git remote add origin ${GIT_REPO_URL}
-                            git add .
-                            git commit -m "Build #\${BUILD_NUMBER}"
-                            git push -u origin main
-                        """
+            script {
+                    dir("test_deploy") {
+                        withCredentials([sshUserPrivateKey(credentialsId: '7bc0c8af-07b7-4784-975d-eb6b79759bb6', usernameVariable: '', passphraseVariable: 'PASSPHRASE')]) {
+                            sh """
+                                git add .
+                                git commit -m "Build #\${BUILD_NUMBER}"
+                                git push origin main
+                            """
                         }
                     }
                 }
             }
+        }
 
         stage('Cleanout') {
             steps {
