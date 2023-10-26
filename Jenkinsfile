@@ -148,7 +148,7 @@ pipeline {
                     
                     // Apply the updated Helm chart to your Kubernetes cluster
                     sh "helm upgrade nginx test_deploy/nginx"
-                    sh "kubectl apply -f test_deploy/nginx"
+                    sh "kubectl apply -f test_deploy/nginx/templates/deployment.yaml"
                 }
             }
         }
