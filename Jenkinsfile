@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-credentials') {
-                        sh "docker push ${DOCKER_IMAGE_NAME}"
+                        sh "docker push lepisok:${env.DOCKER_TAG}"
                     }
                 }
             }
