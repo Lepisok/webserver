@@ -148,6 +148,8 @@ pipeline {
                     
                     // Apply the updated Helm chart to your Kubernetes cluster
                     sh "helm upgrade nginx chart"
+                }
+            }
         }
     
     }
