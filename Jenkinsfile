@@ -114,6 +114,8 @@ pipeline {
                             withCredentials([file(credentialsId: 'github', variable: 'SSH_KEY')]) {
                             sh '''
                                 eval $(ssh-agent -s)
+                                git add .
+                                git commit -m "Build #\${BUILD_NUMBER}"
                                 git push git@github.com:Lepisok/test_deploy.git
                             '''
                         }
