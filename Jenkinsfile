@@ -48,7 +48,7 @@ pipeline {
                 script {
                     if (fileExists('test_deploy')) {
                         dir('test_deploy') {
-                            sh 'git pull origin main' // Update the repository
+                            sh 'git pull origin main --allow-unrelated-histories' // Update the repository
                         }
                     } else {
                         sh "git clone git@github.com:Lepisok/webserver.git"
