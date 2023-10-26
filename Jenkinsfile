@@ -74,7 +74,7 @@ pipeline {
                                 cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
 
-                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \"\${COMMIT_TAG}\"/" > Chart.tmp.yaml
+                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \\"\${COMMIT_TAG}\\"/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
                             """
                         }
