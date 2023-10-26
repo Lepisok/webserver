@@ -35,7 +35,6 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-credentials') {
-                        sh "echo \${DOCKERHUB_PASSWORD} | docker login ${DOCKERHUB_REGISTRY} -u \${DOCKERHUB_USERNAME} --password-stdin"
                         sh "docker push ${DOCKER_IMAGE_NAME}"
                     }
                 }
