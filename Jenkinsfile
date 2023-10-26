@@ -35,6 +35,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'docker-credentials') {
+                        sh "docker info" // Add this line for debugging
                         sh "docker push lepisok:${env.DOCKER_TAG}"
                     }
                 }
