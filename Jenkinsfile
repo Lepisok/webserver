@@ -69,27 +69,26 @@ pipeline {
         stage('Update Chart Version') {
             steps {
                 script {
-                    dir("test_deploy") {
-                        dir("nginx") {
+                    dir("test_deploy/nginx") {
                             sh """
-                                cat Chart.yaml | sed -e "s/version:.*/version: \${env.DOCKER_TAG}/" > Chart.tmp.yaml
+                                cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
 
-                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \"\${env.DOCKER_TAG}\"/" > Chart.tmp.yaml
+                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \"\${COMMIT_TAG}\"/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
                             """
                         }
                     }
                 }
             }
-        }
+        
 
         stage('Update Image Tag') {
             steps {
                 script {
                     dir("test_deploy/nginx") {
                         sh """
-                            cat Chart.yaml | sed -e "s/version:.*/version: \${env.DOCKER_TAG}/" > Chart.tmp.yaml
+                            cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                             mv Chart.tmp.yaml Chart.yaml
                         """
                     }
