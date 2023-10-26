@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     // Используем извлеченный тег для сборки Docker-образа
-                    sh "docker build -t lepisok:${env.DOCKER_TAG} ."
+                    sh "docker build -t lepisok/webserver:${env.DOCKER_TAG} ."
                 }
             }
         }
