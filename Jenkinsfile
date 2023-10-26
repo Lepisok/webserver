@@ -119,13 +119,12 @@ pipeline {
                             git remote add origin ${GIT_REPO_URL}
                             git add .
                             git commit -m "Build #\${BUILD_NUMBER}"
-                            git merge origin/main --allow-unrelated-histories
+                            git push -f
                         """
                         }
                     }
                 }
             }
-
 
         stage('Cleanout') {
             steps {
