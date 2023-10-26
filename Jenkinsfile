@@ -112,13 +112,11 @@ pipeline {
             steps {
                 script {
                     // Initialize a Git repository in the target directory
-                    dir('test_deploy') {
-                        sh "git remote add origin ${GIT_REPO_URL}"
-                        
+                    dir('test_deploy') {                        
                         // Add, commit, and push your files
                         sh """
                             git add .
-                            git commit -m "Commit message"
+                            git commit -m "Build #\${BUILD_NUMBER}"
                             git push origin main
                         """
                         }
