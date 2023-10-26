@@ -113,14 +113,18 @@ pipeline {
                 script {
                     // Initialize a Git repository in the target directory
                     dir('test_deploy') {                        
+                        // Remove the existing Git repository
+                        sh "rm -rf .git"
+                        
+                        // Initialize a new Git repository
+                        sh "git init"
+                        
                         // Add, commit, and push your files
                         sh """
-                            git remote remove origin
                             git remote add origin ${GIT_REPO_URL}
                             git add .
                             git commit -m "Build #\${BUILD_NUMBER}"
-                            git pull origin main --allow-unrelated-histories
-                            git push -f
+                            git push -u origin main
                         """
                         }
                     }
