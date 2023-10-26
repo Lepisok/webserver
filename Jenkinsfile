@@ -115,6 +115,7 @@ pipeline {
                     dir('test_deploy') {                        
                         // Add, commit, and push your files
                         sh """
+                            sh "git remote add origin ${GIT_REPO_URL}"
                             git add .
                             git commit -m "Build #\${BUILD_NUMBER}"
                             git push origin main
