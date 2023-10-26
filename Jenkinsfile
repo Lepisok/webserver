@@ -147,7 +147,7 @@ pipeline {
                     sh "sed -i 's/imageTag: v1/imageTag: v2/' test_deploy/nginx/values.yaml"
                     
                     // Apply the updated Helm chart to your Kubernetes cluster
-                    sh "helm upgrade nginx test_deploy/chart"
+                    sh "helm upgrade nginx test_deploy/nginx"
                 }
             }
         }
