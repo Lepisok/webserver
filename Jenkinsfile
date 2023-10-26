@@ -119,7 +119,7 @@ pipeline {
                             git remote add origin ${GIT_REPO_URL}
                             git add .
                             git commit -m "Build #\${BUILD_NUMBER}"
-                            git pull origin main --allow-unrelated-histories
+                            git merge origin/main --allow-unrelated-histories
                         """
                         }
                     }
