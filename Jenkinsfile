@@ -152,13 +152,6 @@ pipeline {
         stage('Redeploy Kubernetes Deployment') {
             steps {
                 script {
-                    def valuesYamlPath = 'test_deploy/nginx/values.yaml'
-                    def valuesYamlContent = readFile(valuesYamlPath)
-
-                    if (!valuesYamlContent.contains('imageTag:')) {
-                        echo "Updating values.yaml with imageTag"
-                        writeFile(file: valuesYamlPath, text: valuesYamlContent + "\nimageTag: v2")
-    }
                     // Apply the updated Helm chart to your Kubernetes cluster
                     sh "helm upgrade nginx test_deploy/nginx"
                 }
