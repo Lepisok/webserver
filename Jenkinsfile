@@ -114,6 +114,7 @@ pipeline {
                     // Initialize a Git repository in the target directory
                     dir('test_deploy') {                        
                         sh """
+                            git remote remove origin
                             git remote add origin ${GIT_REPO_URL}
                             git add .
                             git commit -m "Build #\${BUILD_NUMBER}"
