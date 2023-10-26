@@ -112,12 +112,12 @@ pipeline {
             steps {
             script {
                     dir("test_deploy") {
-                        withCredentials([sshUserPrivateKey(credentialsId: 'github', keyFileVariable: 'GIT_SSH_KEY')]) {
-                            sh """
-                                git add .
-                                git commit -m "Build #\${BUILD_NUMBER}"
-                                git push origin main
-                            """
+                            withCredentials([file(credentialsId: 'github', variable: 'SSH_KEY')]) {
+                            sh '''
+                                eval $(ssh-agent -s)
+                                ssh-add $SSH_KEY
+                                git push git@github.com:Lepisok/test_deploy.git
+                            '''
                         }
                     }
                 }
