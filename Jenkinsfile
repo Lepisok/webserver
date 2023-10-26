@@ -144,7 +144,7 @@ pipeline {
             steps {
                 script {
                     // Update the Docker image version in your Helm chart values.yaml file
-                    sh "sed -i 's/imageTag: v1/imageTag: v2/' test_deploy/nginx/values.yaml"
+                    sh "sed -i 's/imageTag: v[0-9]/imageTag: v2/' test_deploy/nginx/values.yaml"
                     
                     // Apply the updated Helm chart to your Kubernetes cluster
                     sh "helm upgrade nginx test_deploy/nginx"
