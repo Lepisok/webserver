@@ -36,6 +36,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'lepisok', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh "echo ${DOCKERHUB_PASSWORD} | docker login ${DOCKERHUB_REGISTRY} -u ${DOCKERHUB_USERNAME} --password-stdin"
+                        sh "docker push ${DOCKER_IMAGE_NAME}"
                     }
                 }
             }
