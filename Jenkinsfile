@@ -6,6 +6,8 @@ pipeline {
     COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
+    GIT_REPO_URL = 'https://github.com/Lepisok/webserver.git'
+    GIT_CREDENTIALS_ID = 'github' // Replace with your actual credentials ID
     // Add other environment variables here if needed
 }
 
@@ -108,19 +110,21 @@ pipeline {
 
         stage('Push to Git Repository') {
             steps {
-            script {
-                    dir("test_deploy") {
-                        withCredentials([sshUserPrivateKey(credentialsId: 'github', usernameVariable: 'jenkins')]) {
-                            sh """
-                                git add .
-                                git commit -m "Build #\${BUILD_NUMBER}"
-                                git push origin main
-                            """
+                script {
+                    // Initialize a Git repository in the target directory
+                    dir('test_deploy') {
+                        sh "git remote add origin ${GIT_REPO_URL}"
+                        
+                        // Add, commit, and push your files
+                        sh """
+                            git add .
+                            git commit -m "Commit message"
+                            git push origin main
+                        """
                         }
                     }
                 }
             }
-        }
 
         stage('Cleanout') {
             steps {
