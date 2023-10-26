@@ -84,7 +84,7 @@ pipeline {
                 script {
                     dir("test_deploy/nginx") {
                         sh """
-                            cat values.yaml | sed -e "s/imageTag: v/imageTag: \${COMMIT_TAG}/" > values.tmp.yaml
+                            cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                             mv Chart.tmp.yaml Chart.yaml
                         """
                     }
