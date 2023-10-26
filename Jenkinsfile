@@ -14,13 +14,18 @@ pipeline {
             steps {
                 script {
                     // Извлекаем тег из коммита
-                    env.DOCKER_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+                    def extractedTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
 
-                    echo "Извлеченный тег: ${env.DOCKER_TAG}"
+                    echo "Извлеченный тег: ${extractedTag}"
+
+                    if (extractedTag =~ /\d+\.\d+/) {
+                        env.DOCKER_TAG = extractedTag
+                    } else {
+                        error "Invalid tag format: ${extractedTag}"
+                    }
                 }
             }
-        }
-
+    }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -144,7 +149,7 @@ pipeline {
             steps {
                 script {
                     // Update the Docker image version in your Helm chart values.yaml file
-                    sh "sed -i 's/imageTag: v[0-9]\\.[0-9]/imageTag: v6.0/' test_deploy/nginx/values.yaml"
+                    sh "sed -i 's/imageTag: v/imageTag: v2/' test_deploy/nginx/values.yaml"
                     
                     // Apply the updated Helm chart to your Kubernetes cluster
                     sh "helm upgrade nginx test_deploy/nginx"
