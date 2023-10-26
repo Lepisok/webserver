@@ -117,9 +117,10 @@ pipeline {
                         sh """
                             git remote remove origin
                             git remote add origin ${GIT_REPO_URL}
+                            git fetch origin main:main
                             git add .
                             git commit -m "Build #\${BUILD_NUMBER}"
-                            git push -f
+                            git push -f origin main
                         """
                         }
                     }
