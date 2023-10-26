@@ -110,7 +110,7 @@ pipeline {
             steps {
             script {
                     dir("test_deploy") {
-                        withCredentials([sshUserPrivateKey(credentialsId: 'github', usernameVariable: 'jenkins', passphraseVariable: 'PASSPHRASE')]) {
+                        withCredentials([sshUserPrivateKey(credentialsId: 'github', usernameVariable: 'jenkins')]) {
                             sh """
                                 git add .
                                 git commit -m "Build #\${BUILD_NUMBER}"
