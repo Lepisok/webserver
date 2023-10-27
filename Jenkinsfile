@@ -26,6 +26,16 @@ pipeline {
                 }
             }
     }
+        stage('Check for Git Tag') {
+            when {
+                expression { env.COMMIT_TAG != null }
+            }
+            steps {
+                script {
+                    echo "Found Git Tag: ${env.COMMIT_TAG}"
+                }
+            }
+        }
         stage('Check COMMIT_TAG') {
             steps {
                 echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
