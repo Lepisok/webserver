@@ -3,29 +3,36 @@ pipeline {
 
     environment {
     DOCKERHUB_REGISTRY = 'docker.io'
-    COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
     // Add other environment variables here if needed
 }
 
-    stages {
-        stage('Extract Tag from Commit') {
-            steps {
-                script {
-                    // Извлекаем тег из коммита
-                    def extractedTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
 
-                    echo "Извлеченный тег: ${extractedTag}"
+stages {
+    stage('Extract Tag from Event') {
+        when {
+            expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause) != null }
+        }
+        steps {
+            script {
+                def eventCause = currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause)
+                def eventInfo = eventCause.shortDescription
 
-                    if (extractedTag =~ /\d+\.\d+/) {
-                        env.DOCKER_TAG = extractedTag
-                    } else {
-                        error "Invalid tag format: ${extractedTag}"
-                    }
+                echo "GitHub Event Info: ${eventInfo}"
+
+                // Извлекаем тег из описания события (пример: "Push event to branch master at commit xxx")
+                def extractedTag = eventInfo =~ /Push event to branch .+ at commit .+/
+
+                if (extractedTag) {
+                    env.DOCKER_TAG = extractedTag[0][0..12] // Пример: извлекаем первые 13 символов (длина формата тега)
+                } else {
+                    error "Failed to extract tag from event info"
                 }
             }
+        }
     }
+
         stage('Check COMMIT_TAG') {
             steps {
                 echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
@@ -150,6 +157,9 @@ pipeline {
         }
 
         stage('Redeploy Kubernetes Deployment') {
+            when {
+                expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubTagCause) != null }
+            }
             steps {
                 script {
                     // Apply the updated Helm chart to your Kubernetes cluster
