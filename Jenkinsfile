@@ -3,7 +3,6 @@ pipeline {
 
     environment {
     DOCKERHUB_REGISTRY = 'docker.io'
-    COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
     // Add other environment variables here if needed
@@ -14,15 +13,18 @@ pipeline {
             steps {
                 script {
                     // Извлекаем тег из коммита
-                    echo "Извлеченный тег: ${extractedTag}"
+                    env.COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+                    
+                    echo "Извлеченный тег: ${env.COMMIT_TAG}"
 
-                    if (extractedTag =~ /\d+\.\d+/) {
-                        env.DOCKER_TAG = extractedTag
+                    if (env.COMMIT_TAG =~ /\d+\.\d+/) {
+                        env.DOCKER_TAG = env.COMMIT_TAG
                     } else {
-                        error "Invalid tag format: ${extractedTag}"
+                        error "Invalid tag format: ${env.COMMIT_TAG}"
                     }
                 }
             }
+        }
     }
         stage('Check for Git Tag') {
             when {
@@ -157,10 +159,12 @@ pipeline {
             }
         }
 
-        stage('Redeploy Kubernetes Deployment') {
+       stage('Redeploy Kubernetes Deployment') {
             when {
-                env.COMMIT_TAG != null && 
-                env.COMMIT_TAG != env.PREV_COMMIT_TAG 
+                expression { 
+                    env.COMMIT_TAG != null && 
+                    env.COMMIT_TAG != env.PREV_COMMIT_TAG 
+                }
             }
             steps {
                 script {
