@@ -172,5 +172,6 @@ pipeline {
                     sh "helm upgrade nginx test_deploy/nginx"
                 }
             }
+       }
     }
 }
