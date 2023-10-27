@@ -34,6 +34,7 @@ pipeline {
             }
         }
 
+
         stage('Check COMMIT_TAG') {
             when {
                 expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubTagCause) != null }
