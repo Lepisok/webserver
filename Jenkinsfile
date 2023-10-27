@@ -33,7 +33,6 @@ stages {
         }
     }
 
-
         stage('Check COMMIT_TAG') {
             steps {
                 echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
