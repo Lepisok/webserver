@@ -22,13 +22,9 @@ pipeline {
 
                     echo "GitHub Event Info: ${eventInfo}"
 
-                    if (eventCause instanceof com.cloudbees.jenkins.GitHubPushCause) {
-                        def extractedTag = eventInfo =~ /Push event to branch .+ at commit .+/
-                        if (extractedTag) {
-                            env.DOCKER_TAG = extractedTag[0][0..12]
-                        } else {
-                            error "Failed to extract tag from event info"
-                        }
+                    if (eventCause instanceof com.cloudbees.jenkins.GitHubTagCause) {
+                        // This is a git tag build, set a flag or take appropriate action
+                        env.GIT_TAG_BUILD = 'true'
                     }
                 }
             }
