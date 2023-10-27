@@ -11,13 +11,25 @@ pipeline {
         stage('GitHub Event Handling') {
             when {
                 anyOf {
-                    githubPush(); // Реагировать на коммиты в репозиторий
-                    githubTag();  // Реагировать на создание новых тегов
+                    expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause) != null }
+                    expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubTagCause) != null }
                 }
             }
             steps {
                 script {
-                    // Извлечение тега и другие действия по необходимости
+                    def eventCause = currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause)
+                    def eventInfo = eventCause.shortDescription
+
+                    echo "GitHub Event Info: ${eventInfo}"
+
+                    if (eventCause instanceof com.cloudbees.jenkins.GitHubPushCause) {
+                        def extractedTag = eventInfo =~ /Push event to branch .+ at commit .+/
+                        if (extractedTag) {
+                            env.DOCKER_TAG = extractedTag[0][0..12]
+                        } else {
+                            error "Failed to extract tag from event info"
+                        }
+                    }
                 }
             }
         }
