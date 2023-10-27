@@ -14,8 +14,12 @@ pipeline {
             }
             steps {
                 script {
-                    if (env.CHANGE_ID.startsWith("refs/tags/")) {
+                    def eventCause = currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubTagCause)
+                    if (eventCause != null) {
                         env.GIT_TAG_BUILD = 'true'
+                        env.COMMIT_TAG = eventCause.tag
+                    } else {
+                        env.COMMIT_TAG = ""
                     }
                 }
             }
@@ -26,10 +30,7 @@ pipeline {
                 expression { env.GIT_TAG_BUILD == 'true' }
             }
             steps {
-                script {
-                    env.COMMIT_TAG = env.CHANGE_ID.replace("refs/tags/", "")
-                    echo "Value of COMMIT_TAG: ${env.COMMIT_TAG}"
-                }
+                echo "Value of COMMIT_TAG: ${env.COMMIT_TAG}"
             }
         }
 
