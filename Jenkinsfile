@@ -6,7 +6,7 @@ pipeline {
     USER_EMAIL = 'aleksandr_podkop@mail.ru'
     USER_NAME = 'Lepisok'
     // Add other environment variables here if needed
-}
+    }
 
     stages {
         stage('Extract Tag from Commit') {
