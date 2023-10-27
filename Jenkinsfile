@@ -160,6 +160,9 @@ pipeline {
         }
 
         stage('Redeploy Kubernetes Deployment') {
+            when {
+                expression { env.COMMIT_TAG != null }
+            }
             steps {
                 script {
                     // Apply the updated Helm chart to your Kubernetes cluster
@@ -167,6 +170,5 @@ pipeline {
                 }
             }
         }
-    
     }
 }
