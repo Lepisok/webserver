@@ -1,27 +1,29 @@
-ipeline {
+pipeline {
     agent any
 
     environment {
-        DOCKERHUB_REGISTRY = 'docker.io'
-        COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-        USER_EMAIL = 'aleksandr_podkop@mail.ru'
-        USER_NAME = 'Lepisok'
-        BUILD_REASON = ""
-    }
+    DOCKERHUB_REGISTRY = 'docker.io'
+    COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+    USER_EMAIL = 'aleksandr_podkop@mail.ru'
+    USER_NAME = 'Lepisok'
+    // Add other environment variables here if needed
+}
 
     stages {
-        stage('Determine Build Reason') {
+        stage('Extract Tag from Commit') {
             steps {
                 script {
-                    if (currentBuild.rawBuild.getCause(com.github.events.TagCause)) {
-                        env.BUILD_REASON = "Tag"
+                    // Извлекаем тег из коммита
+                    echo "Извлеченный тег: ${extractedTag}"
+
+                    if (extractedTag =~ /\d+\.\d+/) {
+                        env.DOCKER_TAG = extractedTag
                     } else {
-                        env.BUILD_REASON = "Commit"
+                        error "Invalid tag format: ${extractedTag}"
                     }
                 }
             }
-        }
-
+    }
         stage('Check for Git Tag') {
             when {
                 expression { env.COMMIT_TAG != null }
@@ -32,13 +34,11 @@ ipeline {
                 }
             }
         }
-
         stage('Check COMMIT_TAG') {
             steps {
                 echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -59,11 +59,108 @@ ipeline {
             }
         }
 
-        // Остальные этапы...
+
+        stage('Get Helm Repository Contents') {
+            steps {
+                script {
+                    if (fileExists('test_deploy')) {
+                        dir('test_deploy') {
+                            sh 'git pull origin main' // Update the repository
+                        }
+                    } else {
+                        sh "git clone https://github.com/Lepisok/test_deploy"
+                    }
+                }
+            }
+        }
+
+        stage('Update Chart Version') {
+            steps {
+                script {
+                    dir("test_deploy/nginx") {
+                            sh """
+                                cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
+                                mv Chart.tmp.yaml Chart.yaml
+
+                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \\"\${COMMIT_TAG}\\"/" > Chart.tmp.yaml
+                                mv Chart.tmp.yaml Chart.yaml
+                            """
+                        }
+                    }
+                }
+            }
+        
+
+        stage('Update Image Tag') {
+            steps {
+                script {
+                    dir("test_deploy/nginx") {
+                        sh """
+                            cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
+                            mv Chart.tmp.yaml Chart.yaml
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Create Helm Archive') {
+            steps {
+                script {
+                    dir("test_deploy") {
+                        sh "helm package nginx -d chart"
+                    }
+                }
+            }
+        }
+
+        stage('Update Helm Index') {
+            steps {
+                script {
+                    dir("test_deploy/nginx/chart") {
+                        sh "helm repo index ."
+                    }
+                }
+            }
+        }
+
+        stage('Push to Git Repository') {
+            steps {
+            script {
+                    dir("test_deploy") {
+                            withCredentials([file(credentialsId: 'github', variable: 'SSH_KEY')]) {
+                            sh '''
+                                eval $(ssh-agent -s)
+                                git add .
+                                git commit -m "Build #\${BUILD_NUMBER}"
+                                git push git@github.com:Lepisok/test_deploy.git
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Cleanout') {
+            steps {
+                script {
+                    dir("nginx") {
+                        deleteDir()
+                    }
+                }
+            }
+        }
+
+        stage('Update Previous Commit Tag') {
+            steps {
+                echo "##jenkins[setParameter name='PREV_COMMIT_TAG' value='${COMMIT_TAG}']"
+            }
+        }
 
         stage('Redeploy Kubernetes Deployment') {
             when {
-                expression { env.COMMIT_TAG != null }
+                env.COMMIT_TAG != null && 
+                env.COMMIT_TAG != env.PREV_COMMIT_TAG 
             }
             steps {
                 script {
