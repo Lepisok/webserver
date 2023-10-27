@@ -10,35 +10,25 @@ pipeline {
     stages {
         stage('GitHub Event Handling') {
             when {
-                anyOf {
-                    expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause) != null }
-                    expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubTagCause) != null }
-                }
+                expression { currentBuild.changeSets[0].commitId }
             }
             steps {
                 script {
-                    def eventCause = currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause)
-                    def eventInfo = eventCause.shortDescription
-
-                    echo "GitHub Event Info: ${eventInfo}"
-
-                    if (eventCause instanceof com.cloudbees.jenkins.GitHubTagCause) {
-                        // This is a git tag build, set a flag or take appropriate action
+                    if (env.CHANGE_ID.startsWith("refs/tags/")) {
                         env.GIT_TAG_BUILD = 'true'
                     }
                 }
             }
         }
 
-
         stage('Check COMMIT_TAG') {
             when {
-                expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubTagCause) != null }
+                expression { env.GIT_TAG_BUILD == 'true' }
             }
             steps {
                 script {
-                    // Установите переменную COMMIT_TAG, если это сборка по git-тегу
-                    env.COMMIT_TAG = env.DOCKER_TAG
+                    env.COMMIT_TAG = env.CHANGE_ID.replace("refs/tags/", "")
+                    echo "Value of COMMIT_TAG: ${env.COMMIT_TAG}"
                 }
             }
         }
