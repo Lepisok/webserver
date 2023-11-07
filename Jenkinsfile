@@ -120,7 +120,7 @@ pipeline {
             steps {
             script {
                     dir("test_deploy") {
-                            withCredentials([file(credentialsId: 'test', variable: 'SSH_KEY')]) {
+                            withCredentials([file(credentialsId: 'lepis', variable: 'SSH_KEY')]) {
                             sh '''
                                 eval $(ssh-agent -s)
                                 git add .
