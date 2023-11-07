@@ -27,12 +27,17 @@ pipeline {
             }
         }
 
-        stage('Check COMMIT_TAG') {
+        stage('Check for New Tag in Commit') {
             when {
-                expression { env.COMMIT_TAG != null }
+                expression { env.COMMIT_TAG != null && env.COMMIT_TAG != env.PREV_COMMIT_TAG }
             }
             steps {
-                echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
+                echo "New tag detected: ${COMMIT_TAG}"
+
+                script { 
+                    sh "helm upgrade nginx test_deploy/nginx"
+                    }
+                }
             }
         }
 
@@ -152,19 +157,4 @@ pipeline {
             }
         }
 
-        stage('Check for New Tag in Commit') {
-            when {
-                expression { env.COMMIT_TAG != null && env.COMMIT_TAG != env.PREV_COMMIT_TAG }
-            }
-            steps {
-                echo "New tag detected: ${COMMIT_TAG}"
-                
-                // Добавьте шаги для редеплоя приложения через Helm
-                script {
-                    sh "helm upgrade nginx test_deploy/nginx"
-                    }
-                }
-            }
-        }
-    
 }
