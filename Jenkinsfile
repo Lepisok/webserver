@@ -152,14 +152,18 @@ pipeline {
             }
         }
 
-        stage('Redeploy Kubernetes Deployment') {
+        stage('Check for New Tag in Commit') {
             when {
-                expression { env.COMMIT_TAG != null }
+                expression { env.COMMIT_TAG != null && env.COMMIT_TAG != env.PREV_COMMIT_TAG }
             }
             steps {
+                echo "New tag detected: ${COMMIT_TAG}"
+                
+                // Добавьте шаги для редеплоя приложения через Helm
                 script {
-                    // Apply the updated Helm chart to your Kubernetes cluster
-                    sh "helm upgrade nginx test_deploy/nginx"
+                    dir("test_deploy/nginx") {
+                        sh "helm upgrade nginx test_deploy/nginx"
+                    }
                 }
             }
         }
