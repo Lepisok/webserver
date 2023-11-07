@@ -160,9 +160,8 @@ pipeline {
                 echo "New tag detected: ${COMMIT_TAG}"
                 
                 // Добавьте шаги для редеплоя приложения через Helm
-                script {
-                    dir("test_deploy/nginx") {
-                        sh "helm upgrade nginx test_deploy/nginx"
+                script { {
+                    sh "helm upgrade nginx test_deploy/nginx"
                     }
                 }
             }
