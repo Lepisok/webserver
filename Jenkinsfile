@@ -35,7 +35,7 @@ pipeline {
                 echo "New tag detected: ${COMMIT_TAG}"
 
                 script { 
-                    sh "helm upgrade nginx test_deploy/nginx"
+                        sh "helm upgrade nginx test_deploy/nginx"
                     }
                 }
             }
@@ -156,5 +156,5 @@ pipeline {
                 echo "##jenkins[setParameter name='PREV_COMMIT_TAG' value='${COMMIT_TAG}']"
             }
         }
-
+  
 }
