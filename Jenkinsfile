@@ -1,4 +1,4 @@
-pipeline {
+ipeline {
     agent any
 
     environment {
@@ -8,34 +8,31 @@ pipeline {
     // Add other environment variables here if needed
 }
 
-    stages {
-        stage('Extract Tag from Commit') {
-            steps {
-                script {
-                    // Извлекаем тег из коммита
-                    env.COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-                    
-                    echo "Извлеченный тег: ${env.COMMIT_TAG}"
 
-                    if (env.COMMIT_TAG =~ /\d+\.\d+/) {
-                        env.DOCKER_TAG = env.COMMIT_TAG
-                    } else {
-                        error "Invalid tag format: ${env.COMMIT_TAG}"
-                    }
+stages {
+    stage('Extract Tag from Event') {
+        when {
+            expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause) != null }
+        }
+        steps {
+            script {
+                def eventCause = currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubPushCause)
+                def eventInfo = eventCause.shortDescription
+
+                echo "GitHub Event Info: ${eventInfo}"
+
+                // Извлекаем тег из описания события (пример: "Push event to branch master at commit xxx")
+                def extractedTag = eventInfo =~ /Push event to branch .+ at commit .+/
+
+                if (extractedTag) {
+                    env.DOCKER_TAG = extractedTag[0][0..12] // Пример: извлекаем первые 13 символов (длина формата тега)
+                } else {
+                    error "Failed to extract tag from event info"
                 }
             }
         }
-    
-        stage('Check for Git Tag') {
-            when {
-                expression { env.COMMIT_TAG != null }
-            }
-            steps {
-                script {
-                    echo "Found Git Tag: ${env.COMMIT_TAG}"
-                }
-            }
-        }
+    }
+
         stage('Check COMMIT_TAG') {
             steps {
                 echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
@@ -159,30 +156,17 @@ pipeline {
             }
         }
 
-       stage('Redeploy Kubernetes Deployment') {
+        stage('Redeploy Kubernetes Deployment') {
             when {
-                expression { 
-                    env.COMMIT_TAG != null && 
-                    env.COMMIT_TAG != env.PREV_COMMIT_TAG 
-                }
+                expression { currentBuild.rawBuild.getCause(com.cloudbees.jenkins.GitHubTagCause) != null }
             }
-       }
-        stage('Publish to Artifact Hub') {
-            steps {
-                script {
-                    // Загружаем новую версию Helm Chart в Artifact Hub
-                    withCredentials([usernamePassword(credentialsId: 'artifact-hub-credentials', usernameVariable: 'ARTIFACT_HUB_USERNAME', passwordVariable: 'ARTIFACT_HUB_PASSWORD')]) {
-                        sh "curl -u $ARTIFACT_HUB_USERNAME:$ARTIFACT_HUB_PASSWORD -X POST -F 'chart=@test_deploy/nginx//chart/chart-version.tgz' https://artifacthub.io/api/v1/packages/owner/repository/charts"
-                    }
-                }
-            }
-        }
             steps {
                 script {
                     // Apply the updated Helm chart to your Kubernetes cluster
                     sh "helm upgrade nginx test_deploy/nginx"
                 }
             }
-       }
+        }
+    
     }
 }
