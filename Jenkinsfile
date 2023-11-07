@@ -35,7 +35,7 @@ stages {
 
         stage('Check COMMIT_TAG') {
             steps {
-                echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
+                echo "Value of COMMIT_TAG: ${DOCKER_TAG}"
             }
         }
         stage('Build Docker Image') {
