@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_REGISTRY = 'docker.io'
-        COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-        USER_EMAIL = 'aleksandr_podkop@mail.ru'
-        USER_NAME = 'Lepisok'
-        // Add other environment variables here if needed
-    }
+    DOCKERHUB_REGISTRY = 'docker.io'
+    COMMIT_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+    USER_EMAIL = 'aleksandr_podkop@mail.ru'
+    USER_NAME = 'Lepisok'
+    // Add other environment variables here if needed
+}
 
     stages {
         stage('Extract Tag from Commit') {
@@ -25,22 +25,12 @@ pipeline {
                     }
                 }
             }
-        }
-
-        stage('Check for New Tag in Commit') {
-            when {
-                expression { env.COMMIT_TAG != null && env.COMMIT_TAG != env.PREV_COMMIT_TAG }
-            }
+    }
+        stage('Check COMMIT_TAG') {
             steps {
-                echo "New tag detected: ${COMMIT_TAG}"
-
-                script { 
-                        sh "helm upgrade nginx test_deploy/nginx"
-                    }
-                }
+                echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -61,6 +51,7 @@ pipeline {
             }
         }
 
+
         stage('Get Helm Repository Contents') {
             steps {
                 script {
@@ -79,17 +70,18 @@ pipeline {
             steps {
                 script {
                     dir("test_deploy/nginx") {
-                        sh """
-                            cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
-                            mv Chart.tmp.yaml Chart.yaml
+                            sh """
+                                cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
+                                mv Chart.tmp.yaml Chart.yaml
 
-                            cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \\"\${COMMIT_TAG}\\"/" > Chart.tmp.yaml
-                            mv Chart.tmp.yaml Chart.yaml
-                        """
+                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \\"\${COMMIT_TAG}\\"/" > Chart.tmp.yaml
+                                mv Chart.tmp.yaml Chart.yaml
+                            """
+                        }
                     }
                 }
             }
-        }
+        
 
         stage('Update Image Tag') {
             steps {
@@ -126,13 +118,13 @@ pipeline {
 
         stage('Push to Git Repository') {
             steps {
-                script {
+            script {
                     dir("test_deploy") {
-                        withCredentials([file(credentialsId: 'lepis', variable: 'SSH_KEY')]) {
+                            withCredentials([file(credentialsId: 'lepis', variable: 'SSH_KEY')]) {
                             sh '''
                                 eval $(ssh-agent -s)
                                 git add .
-                                git commit -m "Build #${BUILD_NUMBER}"
+                                git commit -m "Build #\${BUILD_NUMBER}"
                                 git push git@github.com:Lepisok/test_deploy.git
                             '''
                         }
@@ -156,4 +148,18 @@ pipeline {
                 echo "##jenkins[setParameter name='PREV_COMMIT_TAG' value='${COMMIT_TAG}']"
             }
         }
+
+        stage('Redeploy Kubernetes Deployment') {
+            when {
+                expression { env.TAG_NAME != null }
+            }
+            steps {
+                script {
+                    // Apply the updated Helm chart to your Kubernetes cluster
+                    sh "helm upgrade nginx test_deploy/nginx"
+                }
+            }
+        }
+    
     }
+}
