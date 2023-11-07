@@ -166,6 +166,16 @@ pipeline {
                     env.COMMIT_TAG != env.PREV_COMMIT_TAG 
                 }
             }
+        stage('Publish to Artifact Hub') {
+            steps {
+                script {
+                    // Загружаем новую версию Helm Chart в Artifact Hub
+                    withCredentials([usernamePassword(credentialsId: 'artifact-hub-credentials', usernameVariable: 'ARTIFACT_HUB_USERNAME', passwordVariable: 'ARTIFACT_HUB_PASSWORD')]) {
+                        sh "curl -u $ARTIFACT_HUB_USERNAME:$ARTIFACT_HUB_PASSWORD -X POST -F 'chart=@test_deploy/nginx//chart/chart-version.tgz' https://artifacthub.io/api/v1/packages/owner/repository/charts"
+                    }
+                }
+            }
+        }
             steps {
                 script {
                     // Apply the updated Helm chart to your Kubernetes cluster
