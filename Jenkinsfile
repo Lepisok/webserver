@@ -26,6 +26,14 @@ pipeline {
                 }
             }
     }
+        stage('Get Previous Tag') {
+            steps {
+                script {
+                    def previousTag = sh(script: 'git describe --tags --abbrev=0 HEAD^', returnStdout: true).trim()
+                    env.PREV_COMMIT_TAG = previousTag
+                }
+            }
+        }
         stage('Check COMMIT_TAG') {
             steps {
                 echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
