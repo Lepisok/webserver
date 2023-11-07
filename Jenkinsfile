@@ -156,5 +156,5 @@ pipeline {
                 echo "##jenkins[setParameter name='PREV_COMMIT_TAG' value='${COMMIT_TAG}']"
             }
         }
-  
+    }
 }
