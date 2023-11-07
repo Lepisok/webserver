@@ -33,11 +33,6 @@ pipeline {
                 }
             }
         }
-        stage('Check COMMIT_TAG') {
-            steps {
-                echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
-            }
-        }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -78,10 +73,10 @@ pipeline {
                 script {
                     dir("test_deploy/nginx") {
                             sh """
-                                cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
+                                cat Chart.yaml | sed -e "s/version:.*/version: \${DOCKER_TAG}/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
 
-                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \\"\${COMMIT_TAG}\\"/" > Chart.tmp.yaml
+                                cat Chart.yaml | sed -e "s/appVersion:.*/appVersion: \\"\${DOCKER_TAG}\\"/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
                             """
                         }
@@ -95,7 +90,7 @@ pipeline {
                 script {
                     dir("test_deploy/nginx") {
                         sh """
-                            cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
+                            cat Chart.yaml | sed -e "s/version:.*/version: \${DOCKER_TAG}/" > Chart.tmp.yaml
                             mv Chart.tmp.yaml Chart.yaml
                         """
                     }
@@ -152,7 +147,7 @@ pipeline {
 
         stage('Redeploy Kubernetes Deployment') {
             when {
-                expression { env.PREV_COMMIT_TAG != env.COMMIT_TAG && env.COMMIT_TAG != null && env.COMMIT_TAG != '' }
+                expression { env.PREV_COMMIT_TAG != env.DOCKER_TAG && env.DOCKER_TAG != null && env.DOCKER_TAG != '' }
             }
             steps {
                 script {
