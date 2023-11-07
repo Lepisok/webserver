@@ -14,18 +14,28 @@ pipeline {
             steps {
                 script {
                     // Извлекаем тег из коммита
-                    env.DOCKER_TAG = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
+                    def extractedTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
 
-                    echo "Извлеченный тег: ${env.DOCKER_TAG}"
+                    echo "Извлеченный тег: ${extractedTag}"
+
+                    if (extractedTag =~ /\d+\.\d+/) {
+                        env.DOCKER_TAG = extractedTag
+                    } else {
+                        error "Invalid tag format: ${extractedTag}"
+                    }
                 }
             }
+    }
+        stage('Check COMMIT_TAG') {
+            steps {
+                echo "Value of COMMIT_TAG: ${COMMIT_TAG}"
+            }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
                     // Используем извлеченный тег для сборки Docker-образа
-                    sh "docker build -t lepisok:${env.DOCKER_TAG} ."
+                    sh "docker build -t lepisok/webserver:${env.DOCKER_TAG} ."
                 }
             }
         }
@@ -33,12 +43,14 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'lepisok', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh "echo ${DOCKERHUB_PASSWORD} | docker login ${DOCKERHUB_REGISTRY} -u ${DOCKERHUB_USERNAME} --password-stdin"
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker-credentials') {
+                        sh "docker info" // Add this line for debugging
+                        sh "docker push lepisok/webserver:${env.DOCKER_TAG}"
                     }
                 }
             }
         }
+
 
         stage('Get Helm Repository Contents') {
             steps {
@@ -57,8 +69,7 @@ pipeline {
         stage('Update Chart Version') {
             steps {
                 script {
-                    dir("test_deploy") {
-                        dir("nginx") {
+                    dir("test_deploy/nginx") {
                             sh """
                                 cat Chart.yaml | sed -e "s/version:.*/version: \${COMMIT_TAG}/" > Chart.tmp.yaml
                                 mv Chart.tmp.yaml Chart.yaml
@@ -70,7 +81,7 @@ pipeline {
                     }
                 }
             }
-        }
+        
 
         stage('Update Image Tag') {
             steps {
@@ -107,15 +118,16 @@ pipeline {
 
         stage('Push to Git Repository') {
             steps {
-                script {
-                    dir("test_deploy/nginx") {
-                        sh """
-                            git add .
-                            git config --global user.email "${USER_EMAIL}"
-                            git config --global user.name "${USER_NAME}"
-                            git commit -m "Build #\${BUILD_NUMBER}"
-                            git push origin -f
-                        """
+            script {
+                    dir("test_deploy") {
+                            withCredentials([file(credentialsId: 'test', variable: 'SSH_KEY')]) {
+                            sh '''
+                                eval $(ssh-agent -s)
+                                git add .
+                                git commit -m "Build #\${BUILD_NUMBER}"
+                                git push git@github.com:Lepisok/test_deploy.git
+                            '''
+                        }
                     }
                 }
             }
@@ -136,5 +148,15 @@ pipeline {
                 echo "##jenkins[setParameter name='PREV_COMMIT_TAG' value='${COMMIT_TAG}']"
             }
         }
+
+        stage('Redeploy Kubernetes Deployment') {
+            steps {
+                script {
+                    // Apply the updated Helm chart to your Kubernetes cluster
+                    sh "helm upgrade nginx test_deploy/nginx"
+                }
+            }
+        }
+    
     }
 }
