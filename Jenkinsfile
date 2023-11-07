@@ -151,7 +151,9 @@ pipeline {
 
         stage('Redeploy Kubernetes Deployment') {
             when {
-                expression { env.TAG_NAME != null && env.PREV_COMMIT_TAG == null }
+                expression { 
+                    currentBuild.rawBuild.changeSets.collect { it.branch }*.name.any { it.startsWith('refs/tags/') } && env.PREV_COMMIT_TAG != env.COMMIT_TAG
+                }
             }
             steps {
                 script {
