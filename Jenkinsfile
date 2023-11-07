@@ -151,10 +151,7 @@ pipeline {
 
         stage('Redeploy Kubernetes Deployment') {
             when {
-                expression { 
-                    def latestTag = sh(script: 'git describe --tags --abbrev=0', returnStdout: true).trim()
-                    return env.COMMIT_TAG == latestTag
-                }
+                expression { env.TAG_NAME != null && env.PREV_COMMIT_TAG != env.COMMIT_TAG }
             }
             steps {
                 script {
