@@ -166,6 +166,7 @@ pipeline {
                     env.COMMIT_TAG != env.PREV_COMMIT_TAG 
                 }
             }
+       }
         stage('Publish to Artifact Hub') {
             steps {
                 script {
