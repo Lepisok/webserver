@@ -145,7 +145,7 @@ pipeline {
 
         stage('Redeploy Kubernetes Deployment') {
             when {
-                expression { env.PREV_COMMIT_TAG != env.COMMIT_TAG }
+                expression { env.PREV_COMMIT_TAG != env.COMMIT_TAG && env.COMMIT_TAG != null && env.COMMIT_TAG != '' }
             }
             steps {
                 script {
