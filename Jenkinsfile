@@ -143,12 +143,6 @@ pipeline {
             }
         }
 
-        stage('Update Previous Commit Tag') {
-            steps {
-                echo "##jenkins[setParameter name='PREV_COMMIT_TAG' value='${COMMIT_TAG}']"
-            }
-        }
-
         stage('Redeploy Kubernetes Deployment') {
             when {
                 expression { 
